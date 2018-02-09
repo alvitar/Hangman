@@ -4,6 +4,15 @@ var env = {
 var game;
 
 /**
+ * Hangman implements the logic of a Hangman game which is a
+ * front end to a RESTful service. It makes a request to create
+ * a new game. As the user guesses letters by clicking buttons,
+ * a request is made to check the guess and the button style is
+ * changed to correct (green) or incorrect (red). The blanks in
+ * the answer line are filled in with correct guesses.
+ */
+
+/**
  * Construct a new Hangman game.
  */
 function Hangman() {

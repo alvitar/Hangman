@@ -58,6 +58,7 @@ xclass.declare('Hangman', XObject, {
             var msg = "response: " + xhr.responseText;
             console.log(msg);
             var response = JSON.parse(xhr.responseText);
+	    this.response = response;
             this.hangman = response.hangman;
             this.incorrect = response.incorrect;
             this.updateButton(response.correct, letter);
@@ -92,7 +93,7 @@ xclass.declare('Hangman', XObject, {
         var text;
         if ( status == "Lost" ) {
             this.ready = false;
-            text = "You Lose!!!!";
+            text = "You Lose!!!!  " + this.response.solution;
         }
         else if ( status == "Won" ) {
             this.ready = false;

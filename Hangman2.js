@@ -61,12 +61,9 @@ xclass.declare('Hangman', XObject, {
             this.hangman = response.hangman;
             this.incorrect = response.incorrect;
             this.updateButton(response.correct, letter);
-            var hmImage = document.getElementById("hmImage");
-            hmImage.src = "images/hm" + this.incorrect.length + ".png";
+            this.updateHangman();
             this.updateAnswer();
-            if ( response.status == "Lost" ) {
-                this.ready = false;
-            }
+            this.updateBanner(response.status);
         }
     },
 
@@ -86,6 +83,28 @@ xclass.declare('Hangman', XObject, {
     },
 
     /**
+     * Update the banner to indicate if the game is won or lost.
+     *
+     * @param status  the status from the service request which can
+     *                be 'InProgress', 'Won', or 'Lost'.
+     */
+    updateBanner: function(status) {
+        var text;
+        if ( status == "Lost" ) {
+            this.ready = false;
+            text = "You Lose!!!!";
+        }
+        else if ( status == "Won" ) {
+            this.ready = false;
+            text = "You Win!!!!";
+        }
+        if ( !this.ready ) {
+            var banner = document.getElementById('banner');
+            banner.innerHTML = text;
+        }
+    },
+
+    /**
      * Update the button style to indicate if the guess was correct.
      *
      * @param correct  true if the guess was correct.
@@ -97,6 +116,14 @@ xclass.declare('Hangman', XObject, {
         button.classList.remove(this.activeStyle);
         var style = correct ? this.correctStyle : this.incorrectStyle;
         button.classList.add(style);
+    },
+
+    /**
+     * Update the Hangman image.
+     */
+    updateHangman: function() {
+        var hmImage = document.getElementById("hmImage");
+        hmImage.src = "images/hm" + this.incorrect.length + ".png";
     }
 
 });

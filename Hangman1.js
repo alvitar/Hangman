@@ -54,23 +54,20 @@ Hangman.prototype.start = function() {
  */
 Hangman.prototype.guess = function(letter) {
     if ( this.ready ) {
-	var guessJSON = '{ "letter": "' + letter + '" }';
-	var xhr = new XMLHttpRequest();
-	xhr.open("PUT", this.endpoint + "/?id=" + this.id, false);
-	xhr.setRequestHeader("Content-type", "application/json");
-	xhr.send(guessJSON);
-	var msg = "response: " + xhr.responseText;
-	console.log(msg);
-	var response = JSON.parse(xhr.responseText);
-	this.hangman = response.hangman;
-	this.incorrect = response.incorrect;
-	this.updateButton(response.correct, letter);
-	var hmImage = document.getElementById("hmImage");
-	hmImage.src = "images/hm" + this.incorrect.length + ".png";
-	this.updateAnswer();
-	if ( response.status == "Lost" ) {
-	    this.ready = false;
-	}
+        var guessJSON = '{ "letter": "' + letter + '" }';
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", this.endpoint + "/?id=" + this.id, false);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(guessJSON);
+        var msg = "response: " + xhr.responseText;
+        console.log(msg);
+        var response = JSON.parse(xhr.responseText);
+        this.hangman = response.hangman;
+        this.incorrect = response.incorrect;
+        this.updateButton(response.correct, letter);
+        this.updateHangman();
+        this.updateAnswer();
+        this.updateBanner(response.status);
     }
 }
 
@@ -81,12 +78,34 @@ Hangman.prototype.updateAnswer = function() {
     var wordRow = document.getElementById("wordRow");
     var innerHTML = "";
     for ( var i = 0; i < this.hangman.length; ++i ) {
-	var hletter = this.hangman[i];
-	hletter = hletter == null ? '_' : hletter;
-	var part = this.answerFormat.replace('{letter}', hletter);
-	innerHTML = innerHTML.concat(part);
+        var hletter = this.hangman[i];
+        hletter = hletter == null ? '_' : hletter;
+        var part = this.answerFormat.replace('{letter}', hletter);
+        innerHTML = innerHTML.concat(part);
     }
     wordRow.innerHTML = innerHTML;
+}
+
+/**
+ * Update the banner to indicate if the game is won or lost.
+ *
+ * @param status  the status from the service request which can
+ *                be 'InProgress', 'Won', or 'Lost'.
+ */
+Hangman.prototype.updateBanner = function(status) {
+    var text;
+    if ( status == "Lost" ) {
+        this.ready = false;
+        text = "You Lose!!!!";
+    }
+    else if ( status == "Won" ) {
+        this.ready = false;
+        text = "You Win!!!!";
+    }
+    if ( !this.ready ) {
+        var banner = document.getElementById('banner');
+        banner.innerHTML = text;
+    }
 }
 
 /**
@@ -102,6 +121,15 @@ Hangman.prototype.updateButton = function(correct, letter) {
     var style = correct ? this.correctStyle : this.incorrectStyle;
     button.classList.add(style);
 }
+
+/**
+ * Update the Hangman image.
+ */
+Hangman.prototype.updateHangman = function() {
+    var hmImage = document.getElementById("hmImage");
+    hmImage.src = "images/hm" + this.incorrect.length + ".png";
+}
+
 
 /**
  * Start a new game when called by onLoad event.

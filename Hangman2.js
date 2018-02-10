@@ -20,7 +20,7 @@ xclass.declare('Hangman', XObject, {
     activeStyle: "btn-outline-light",
     correctStyle: "btn-success",
     incorrectStyle: "btn-danger",
-    answerFormat: '<div class="col-2"><img class="hm-img" src="images/lt{letter}.png" /></div>',
+    answerFormat: '<div class="col-1"><img class="hm-img" src="images/lt{letter}.png" /></div>',
 
     /**
      * Start a new Hangman game. Perform a service request to initiate

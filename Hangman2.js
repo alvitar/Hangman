@@ -21,6 +21,10 @@ xclass.declare('Hangman', XObject, {
     correctStyle: "btn-success",
     incorrectStyle: "btn-danger",
     answerFormat: '<div class="col-1"><img class="hm-img" src="images/lt{letter}.png" /></div>',
+    letters: [
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    ],
 
     /**
      * Start a new Hangman game. Perform a service request to initiate
@@ -99,10 +103,12 @@ xclass.declare('Hangman', XObject, {
             this.ready = false;
             text = "You Win!!!!";
         }
-        if ( !this.ready ) {
-            var banner = document.getElementById('banner');
-            banner.innerHTML = text;
-        }
+        else {
+            this.ready = true;
+	    text = "Guess a New Letter";
+	}
+        var banner = document.getElementById('banner');
+        banner.innerHTML = text;
     },
 
     /**
@@ -125,6 +131,24 @@ xclass.declare('Hangman', XObject, {
     updateHangman: function() {
         var hmImage = document.getElementById("hmImage");
         hmImage.src = "images/hm" + this.incorrect.length + ".png";
+    },
+
+    /**
+     * Reset the game.
+     */
+    reset: function() {
+	// Reset the button grid.
+	for ( var i = 0; i < this.letters.length; ++i ) {
+	    var letter = this.letters[i];
+            var id = "btn" + letter;
+            var button = document.getElementById(id);
+            button.classList.remove(this.correctStyle);
+            button.classList.remove(this.incorrectStyle);
+            button.classList.add(this.activeStyle);
+	}    
+	// Reset the banner.
+	this.updateBanner("");
+	this.start();
     }
 
 });
@@ -146,4 +170,11 @@ function guess(letter) {
     var msg = "letter: " + letter;
     console.log(msg);
     game.guess(letter);
+}
+
+/**
+ * Handle the onclick event when the user clicks the New Game button.
+ */
+function newGame() {
+    game.reset();
 }

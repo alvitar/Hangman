@@ -14,10 +14,10 @@ var game;
 xclass.declare('Hangman', XObject, {
     constructor: function() {
         this.ready = false;
-	this.won = 0;
-	this.lost = 0;
-	this.correct = 0;
-	this.incorrect = 0;
+        this.won = 0;
+        this.lost = 0;
+        this.correct = 0;
+        this.incorrect = 0;
     },
     endpoint: env.host + "/api/Games",
     baseStyles: "btn btn-sm btn-block ",
@@ -26,8 +26,8 @@ xclass.declare('Hangman', XObject, {
     incorrectStyle: "btn-danger",
     answerFormat: '<div class="col-1"><img class="hm-img" src="images/lt{letter}.png" /></div>',
     letters: [
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     ],
 
     /**
@@ -35,6 +35,7 @@ xclass.declare('Hangman', XObject, {
      * a new game, obtain the answer length, and update the answer row.
      */
     start: function() {
+        this.updateBanner("");
         var xhr = new XMLHttpRequest();
         xhr.open("POST", this.endpoint, false);
         xhr.setRequestHeader("Content-type", "application/json");
@@ -45,8 +46,9 @@ xclass.declare('Hangman', XObject, {
         this.id = response.gameId;
         this.hangman = response.hangman;
         this.updateAnswer();
-	this.updateHangman(0);
-	this.updateStats();
+        this.updateHangman(0);
+        this.updateStats();
+        this.updateBanner("InProgress");
         this.ready = true;
     },
 
@@ -67,19 +69,19 @@ xclass.declare('Hangman', XObject, {
             var msg = "response: " + xhr.responseText;
             console.log(msg);
             var response = JSON.parse(xhr.responseText);
-	    this.response = response;
+            this.response = response;
             this.hangman = response.hangman;
-	    if ( response.correct ) {
-		this.correct++;
-	    }
-	    else {
-		this.incorrect++;
-	    }
+            if ( response.correct ) {
+                this.correct++;
+            }
+            else {
+                this.incorrect++;
+            }
             this.updateButton(response.correct, letter);
             this.updateHangman(response.incorrect.length);
             this.updateAnswer();
             this.updateBanner(response.status);
-	    this.updateStats();
+            this.updateStats();
         }
     },
 
@@ -108,18 +110,21 @@ xclass.declare('Hangman', XObject, {
         var text;
         if ( status == "Lost" ) {
             this.ready = false;
-	    this.lost++;
+            this.lost++;
             text = "You Lose!!!!  " + this.response.solution;
         }
         else if ( status == "Won" ) {
             this.ready = false;
-	    this.won++;
+            this.won++;
             text = "You Win!!!!";
         }
-        else {
+        else if ( status == "InProgress" ) {
             this.ready = true;
-	    text = "Guess a New Letter";
-	}
+            text = "Guess a New Letter";
+        }
+        else {
+            text = "Processing...";
+        }
         var banner = document.getElementById('banner');
         banner.innerHTML = text;
     },
@@ -152,39 +157,38 @@ xclass.declare('Hangman', XObject, {
      * Update the statistics display.
      */
     updateStats: function() {
-	var totalGuesses = this.correct + this.incorrect;
-	var guessPercent = totalGuesses == 0 ? 0 :
-	    Math.round((this.correct * 100) / totalGuesses);
-	var totalGames = this.won + this.lost;
-	var gamesPercent = totalGames == 0 ? 0 :
-	    Math.round((this.won * 100) / totalGames);
-	var msg = "Statistics: " + this.correct + " correct, " +
-	    this.incorrect + " incorrect, " +
-	    guessPercent + "% correct, " +
-	    this.won + " won, " + this.lost + " lost, " +
-	    gamesPercent + "% won";
-	var stats = document.getElementById("stats");
-	stats.innerHTML = msg;
+        var totalGuesses = this.correct + this.incorrect;
+        var guessPercent = totalGuesses == 0 ? 0 :
+            Math.round((this.correct * 100) / totalGuesses);
+        var totalGames = this.won + this.lost;
+        var gamesPercent = totalGames == 0 ? 0 :
+            Math.round((this.won * 100) / totalGames);
+        var msg = "Statistics: " + this.correct + " correct, " +
+            this.incorrect + " incorrect, " +
+            guessPercent + "% correct, " +
+            this.won + " won, " + this.lost + " lost, " +
+            gamesPercent + "% won";
+        var stats = document.getElementById("stats");
+        stats.innerHTML = msg;
     },
 
     /**
      * Reset the game.
      */
     reset: function() {
-	// Reset the button grid.
-	for ( var i = 0; i < this.letters.length; ++i ) {
-	    var letter = this.letters[i];
+        // Reset the button grid.
+        for ( var i = 0; i < this.letters.length; ++i ) {
+            var letter = this.letters[i];
             var id = "btn" + letter;
             var button = document.getElementById(id);
             button.classList.remove(this.correctStyle);
             button.classList.remove(this.incorrectStyle);
             button.classList.add(this.activeStyle);
-	}    
-	// Reset the banner.
-	this.updateBanner("");
-	this.updateHangman(0);
-	this.updateStats();
-	this.start();
+        }    
+        // Reset the banner.
+        this.updateHangman(0);
+        this.updateStats();
+        this.start();
     }
 
 });

@@ -35,7 +35,7 @@ xclass.declare('Hangman', XObject, {
      * a new game, obtain the answer length, and update the answer row.
      */
     start: function() {
-        this.updateBanner("");
+        this.updateStatus("");
         var xhr = new XMLHttpRequest();
         xhr.open("POST", this.endpoint, false);
         xhr.setRequestHeader("Content-type", "application/json");
@@ -47,8 +47,8 @@ xclass.declare('Hangman', XObject, {
         this.hangman = response.hangman;
         this.updateAnswer();
         this.updateHangman(0);
-        this.updateStats();
-        this.updateBanner("InProgress");
+        this.updateStatitics();
+        this.updateStatus("InProgress");
         this.ready = true;
     },
 
@@ -80,8 +80,8 @@ xclass.declare('Hangman', XObject, {
             this.updateButton(response.correct, letter);
             this.updateHangman(response.incorrect.length);
             this.updateAnswer();
-            this.updateBanner(response.status);
-            this.updateStats();
+            this.updateStatus(response.status);
+            this.updateStatitics();
         }
     },
 
@@ -101,12 +101,14 @@ xclass.declare('Hangman', XObject, {
     },
 
     /**
-     * Update the banner to indicate if the game is won or lost.
+     * Update the status to indicate if the game is won or lost,
+     * if waiting for the service request, or if ready for the
+     * user to guess another letter.
      *
      * @param status  the status from the service request which can
      *                be 'InProgress', 'Won', or 'Lost'.
      */
-    updateBanner: function(status) {
+    updateStatus: function(status) {
         var text;
         if ( status == "Lost" ) {
             this.ready = false;
@@ -125,8 +127,8 @@ xclass.declare('Hangman', XObject, {
         else {
             text = "Processing...";
         }
-        var banner = document.getElementById('banner');
-        banner.innerHTML = text;
+        var status = document.getElementById('status');
+        status.innerHTML = text;
     },
 
     /**
@@ -156,7 +158,7 @@ xclass.declare('Hangman', XObject, {
     /**
      * Update the statistics display.
      */
-    updateStats: function() {
+    updateStatitics: function() {
         var totalGuesses = this.correct + this.incorrect;
         var guessPercent = totalGuesses == 0 ? 0 :
             Math.round((this.correct * 100) / totalGuesses);
@@ -185,9 +187,8 @@ xclass.declare('Hangman', XObject, {
             button.classList.remove(this.incorrectStyle);
             button.classList.add(this.activeStyle);
         }    
-        // Reset the banner.
         this.updateHangman(0);
-        this.updateStats();
+        this.updateStatitics();
         this.start();
     }
 

@@ -86,6 +86,14 @@ xclass.declare('Hangman', XObject, {
     },
 
     /**
+     * Reveal the correct answer.
+     */
+    revealAnswer: function() {
+        this.hangman = this.response.solution.split("");
+        this.updateAnswer();
+    },
+
+    /**
      * Update the answer row to reflect any correctly guessed letters.
      */
     updateAnswer: function() {
@@ -98,37 +106,6 @@ xclass.declare('Hangman', XObject, {
             innerHTML = innerHTML.concat(part);
         }
         wordRow.innerHTML = innerHTML;
-    },
-
-    /**
-     * Update the status to indicate if the game is won or lost,
-     * if waiting for the service request, or if ready for the
-     * user to guess another letter.
-     *
-     * @param status  the status from the service request which can
-     *                be 'InProgress', 'Won', or 'Lost'.
-     */
-    updateStatus: function(status) {
-        var text;
-        if ( status == "Lost" ) {
-            this.ready = false;
-            this.lost++;
-            text = "You Lose!!!!  " + this.response.solution;
-        }
-        else if ( status == "Won" ) {
-            this.ready = false;
-            this.won++;
-            text = "You Win!!!!";
-        }
-        else if ( status == "InProgress" ) {
-            this.ready = true;
-            text = "Guess a New Letter";
-        }
-        else {
-            text = "Processing...";
-        }
-        var status = document.getElementById('status');
-        status.innerHTML = text;
     },
 
     /**
@@ -172,6 +149,38 @@ xclass.declare('Hangman', XObject, {
             gamesPercent + "% won";
         var stats = document.getElementById("stats");
         stats.innerHTML = msg;
+    },
+
+    /**
+     * Update the status to indicate if the game is won or lost,
+     * if waiting for the service request, or if ready for the
+     * user to guess another letter.
+     *
+     * @param status  the status from the service request which can
+     *                be 'InProgress', 'Won', or 'Lost'.
+     */
+    updateStatus: function(status) {
+        var text;
+        if ( status == "Lost" ) {
+            this.ready = false;
+            this.lost++;
+            text = "You Lose!";
+            this.revealAnswer();
+        }
+        else if ( status == "Won" ) {
+            this.ready = false;
+            this.won++;
+            text = "You Win!";
+        }
+        else if ( status == "InProgress" ) {
+            this.ready = true;
+            text = "Guess a New Letter";
+        }
+        else {
+            text = "Processing...";
+        }
+        var status = document.getElementById('status');
+        status.innerHTML = text;
     },
 
     /**

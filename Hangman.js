@@ -14,6 +14,10 @@ var game;
 xclass.declare('Hangman', XObject, {
     constructor: function() {
         this.ready = false;
+	this.won = 0;
+	this.lost = 0;
+	this.correct = 0;
+	this.incorrect = 0;
     },
     endpoint: env.host + "/api/Games",
     baseStyles: "btn btn-sm btn-block ",
@@ -40,9 +44,9 @@ xclass.declare('Hangman', XObject, {
         var response = JSON.parse(xhr.responseText);
         this.id = response.gameId;
         this.hangman = response.hangman;
-        this.incorrect = response.incorrect;
         this.updateAnswer();
 	this.updateHangman(0);
+	this.updateStats();
         this.ready = true;
     },
 
@@ -65,11 +69,17 @@ xclass.declare('Hangman', XObject, {
             var response = JSON.parse(xhr.responseText);
 	    this.response = response;
             this.hangman = response.hangman;
-            this.incorrect = response.incorrect;
+	    if ( response.correct ) {
+		this.correct++;
+	    }
+	    else {
+		this.incorrect++;
+	    }
             this.updateButton(response.correct, letter);
-            this.updateHangman(this.incorrect.length);
+            this.updateHangman(response.incorrect.length);
             this.updateAnswer();
             this.updateBanner(response.status);
+	    this.updateStats();
         }
     },
 
@@ -98,10 +108,12 @@ xclass.declare('Hangman', XObject, {
         var text;
         if ( status == "Lost" ) {
             this.ready = false;
+	    this.lost++;
             text = "You Lose!!!!  " + this.response.solution;
         }
         else if ( status == "Won" ) {
             this.ready = false;
+	    this.won++;
             text = "You Win!!!!";
         }
         else {
@@ -137,6 +149,25 @@ xclass.declare('Hangman', XObject, {
     },
 
     /**
+     * Update the statistics display.
+     */
+    updateStats: function() {
+	var totalGuesses = this.correct + this.incorrect;
+	var guessPercent = totalGuesses == 0 ? 0 :
+	    Math.round((this.correct * 100) / totalGuesses);
+	var totalGames = this.won + this.lost;
+	var gamesPercent = totalGames == 0 ? 0 :
+	    Math.round((this.won * 100) / totalGames);
+	var msg = "Statistics: " + this.correct + " correct, " +
+	    this.incorrect + " incorrect, " +
+	    guessPercent + "% correct, " +
+	    this.won + " won, " + this.lost + " lost, " +
+	    gamesPercent + "% won";
+	var stats = document.getElementById("stats");
+	stats.innerHTML = msg;
+    },
+
+    /**
      * Reset the game.
      */
     reset: function() {
@@ -152,6 +183,7 @@ xclass.declare('Hangman', XObject, {
 	// Reset the banner.
 	this.updateBanner("");
 	this.updateHangman(0);
+	this.updateStats();
 	this.start();
     }
 

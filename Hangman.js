@@ -42,6 +42,7 @@ xclass.declare('Hangman', XObject, {
         this.hangman = response.hangman;
         this.incorrect = response.incorrect;
         this.updateAnswer();
+	this.updateHangman(0);
         this.ready = true;
     },
 
@@ -66,7 +67,7 @@ xclass.declare('Hangman', XObject, {
             this.hangman = response.hangman;
             this.incorrect = response.incorrect;
             this.updateButton(response.correct, letter);
-            this.updateHangman();
+            this.updateHangman(this.incorrect.length);
             this.updateAnswer();
             this.updateBanner(response.status);
         }
@@ -127,10 +128,12 @@ xclass.declare('Hangman', XObject, {
 
     /**
      * Update the Hangman image.
+     *
+     * @param count  the number of incorrect guesses.
      */
-    updateHangman: function() {
+    updateHangman: function(count) {
         var hmImage = document.getElementById("hmImage");
-        hmImage.src = "images/hm" + this.incorrect.length + ".png";
+        hmImage.src = "images/hm" + count + ".png";
     },
 
     /**
@@ -148,6 +151,7 @@ xclass.declare('Hangman', XObject, {
 	}    
 	// Reset the banner.
 	this.updateBanner("");
+	this.updateHangman(0);
 	this.start();
     }
 

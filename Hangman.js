@@ -61,6 +61,7 @@ xclass.declare('Hangman', XObject, {
      */
     guess: function(letter) {
         if ( this.ready ) {
+            this.updateStatus("");
             var guessJSON = '{ "letter": "' + letter + '" }';
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", this.endpoint + "/?id=" + this.id, false);
